@@ -38,7 +38,7 @@
 
 .CODE
         ; ------------------------------------------ RYSUJ GRACZ1 WYGRAL PROC ------------------------------------
-    RYSUJ_GRACZ1_WYGRAL PROC
+        RYSUJ_GRACZ1_WYGRAL PROC
         mov ah, 02h                 ; konfiguracja do ustawienia pozycji kursora
         mov bh, 00h                 ; konfiguracja do numeru strony
         mov dh, 20d                 ; wiersz
@@ -75,48 +75,44 @@
 
     ; ------------------------------------------ WYWOLAJ DZWIEK1 PROC ------------------------------------
     WYWOLAJ_DZWIEK PROC
-        ; port 43h - sluzy do zapisywania polecen sterujacych dla ukladu dzwiekowego
-        ; port 42h - sluzy do zapisywania czestotliwosci dzwieku
-        mov al, 182         ; poczatkowe ustawienie glosnika, na podstawie : muruganad.com
-        out 43h, al         ; wpisanie do portu 43h wartosci rejestru al
-        mov ax, 1600d       ; ustawienie danej czestotliwosci dzwieku
-        out 42h, al         ; przesylamy lower byte czestotliwosci do portu 42h
-        mov al, ah          ; przepisanie higher byte do rejestru al
-        out 42h, al         ; przesylamy higher byte czestotliwosci do portu 42h
-        in al, 61h          ; odczytanie statusu kontrolera klawiatury, za pomoca tego mozna glosniki wlaczyc
-        or al, 03h          ; status kontrolera klawiatury or z 00000011, co ustawi ostatnie 2 bity, a reszte zostawi bez zmian, ostatnie 2 bity wlacza glosnik
-        out 61h, al         ; wpisanie do portu 61h (statusu kontrolera klawiatury) zmienionego rejestru al
-        mov CX, 01H         ; tutaj robimy wstrzymanie programu na chwile zeby dzwiek sie wydal
-        mov DX, 4240H
-        mov ah, 86H
-        int 15H             ; wywoluje to wtrzymanie programu int 15h
-        in al, 61h          ; ponawiamy proces z wczesniej tylko teraz wylaczamy 2 ostatnie bity
-        and al, 0FCh        ; 
-        out 61h, al         ; dzieki czemu wylaczylismy glosnik
+        MOV AL, 252         ; 2) Set up the write to the control word register.
+        OUT 43h, AL         ; 2) Perform the write.
+        MOV AX, 1600d       ; 2) Pull back the frequency from BX.
+        OUT 42h, AL         ; 2) Send lower byte of the frequency.
+        MOV AL, AH          ; 2) Load higher byte of the frequency.
+        OUT 42h, AL         ; 2) Send the higher byte.
+        IN AL, 61h          ; 3) Read the current keyboard controller status.
+        OR AL, 03h          ; 3) Turn on 0 and 1 bit, enabling the PC speaker gate and the data transfer.
+        OUT 61h, AL         ; 3) Save the new keyboard controller status.
+        MOV CX, 01H
+        MOV DX, 4240H
+        MOV AH, 86H
+        INT 15H
+        IN AL, 61h          ; 5) Read the current keyboard controller status.
+        AND AL, 0FCh        ; 5) Zero 0 and 1 bit, simply disabling the gate.
+        OUT 61h, AL         ; 5) Write the new keyboard controller status.
 
         ret
     WYWOLAJ_DZWIEK ENDP
 
     ; ------------------------------------------ WYWOLAJ DZWIEK2 PROC ------------------------------------
     WYWOLAJ_DZWIEK2 PROC
-        ; port 43h - sluzy do zapisywania polecen sterujacych dla ukladu dzwiekowego
-        ; port 42h - sluzy do zapisywania czestotliwosci dzwieku
-        mov al, 182         ; poczatkowe ustawienie glosnika, na podstawie : muruganad.com
-        out 43h, al         ; wpisanie do portu 43h wartosci rejestru al
-        mov ax, 2500d       ; ustawienie danej czestotliwosci dzwieku
-        out 42h, al         ; przesylamy lower byte czestotliwosci do portu 42h
-        mov al, ah          ; przepisanie higher byte do rejestru al
-        out 42h, al         ; przesylamy higher byte czestotliwosci do portu 42h
-        in al, 61h          ; odczytanie statusu kontrolera klawiatury, za pomoca tego mozna glosniki wlaczyc
-        or al, 03h          ; status kontrolera klawiatury or z 00000011, co ustawi ostatnie 2 bity, a reszte zostawi bez zmian, ostatnie 2 bity wlacza glosnik
-        out 61h, al         ; wpisanie do portu 61h (statusu kontrolera klawiatury) zmienionego rejestru al
-        mov CX, 01H         ; tutaj robimy wstrzymanie programu na chwile zeby dzwiek sie wydal
-        mov DX, 4240H
-        mov ah, 86H
-        int 15H             ; wywoluje to wtrzymanie programu int 15h
-        in al, 61h          ; ponawiamy proces z wczesniej tylko teraz wylaczamy 2 ostatnie bity
-        and al, 0FCh        ; 
-        out 61h, al         ; dzieki czemu wylaczylismy glosnik
+        MOV AL, 252         ; 2) Set up the write to the control word register.
+        OUT 43h, AL         ; 2) Perform the write.
+        MOV AX, 3000d          ; 2) Pull back the frequency from BX.
+        OUT 42h, AL         ; 2) Send lower byte of the frequency.
+        MOV AL, AH          ; 2) Load higher byte of the frequency.
+        OUT 42h, AL         ; 2) Send the higher byte.
+        IN AL, 61h          ; 3) Read the current keyboard controller status.
+        OR AL, 03h          ; 3) Turn on 0 and 1 bit, enabling the PC speaker gate and the data transfer.
+        OUT 61h, AL         ; 3) Save the new keyboard controller status.
+        MOV CX, 01H
+        MOV DX, 4240H
+        MOV AH, 86H
+        INT 15H
+        IN AL, 61h          ; 5) Read the current keyboard controller status.
+        AND AL, 0FCh        ; 5) Zero 0 and 1 bit, simply disabling the gate.
+        OUT 61h, AL         ; 5) Write the new keyboard controller status.
 
         ret
     WYWOLAJ_DZWIEK2 ENDP
